@@ -1,0 +1,18 @@
+{
+  "name": "blog-management-system",
+  "version": "1.0.0",
+  "description": "Production blog management system with Cloudflare Pages and D1",
+  "scripts": {
+    "dev": "wrangler pages dev public --binding DB=local --d1 BLOG_DB",
+    "deploy": "wrangler pages deploy public",
+    "db:create": "wrangler d1 create blog-db",
+    "db:migrate": "wrangler d1 execute blog-db --file=./schemas/001_create_blog_tables.sql",
+    "db:seed": "wrangler d1 execute blog-db --file=./schemas/002_add_sample_data.sql"
+  },
+  "dependencies": {
+    "jose": "^5.0.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
