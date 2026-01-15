@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --sidebar-bg: #1e293b;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --radius: 8px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text-main);
+        }
+
+        .sidebar {
+            width: 250px;
+            background: var(--sidebar-bg);
+            color: white;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 3px solid var(--primary);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+        }
+
+        .user-info {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-published {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-draft {
+            background: #e0f2fe;
+            color: #075985;
+        }
+
+        .badge-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--bg);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--card-bg);
+            color: var(--text-main);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .ql-editor {
+            min-height: 300px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border-left: 4px solid var(--primary);
+            padding: 16px 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(120%);
+            transition: transform 0.3s ease-out;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            border-color: var(--success);
+        }
+
+        .toast.error {
+            border-color: var(--danger);
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <h1><i class="ri-pages-line"></i> Blog Admin</h1>
+        </div>
+        
+        <div class="nav-links">
+            <a href="#" class="nav-item active" data-tab="dashboard">
+                <i class="ri-dashboard-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="posts">
+                <i class="ri-article-line"></i>
+                <span>Posts</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="categories">
+                <i class="ri-folder-line"></i>
+                <span>Categories</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="comments">
+                <i class="ri-chat-3-line"></i>
+                <span>Comments</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="media">
+                <i class="ri-image-line"></i>
+                <span>Media</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="settings">
+                <i class="ri-settings-3-line"></i>
+                <span>Settings</span>
+            </a>
+        </div>
+        
+        <div class="user-info">
+            <div class="user-avatar" id="user-avatar">U</div>
+            <div>
+                <div id="user-name">Loading...</div>
+                <small style="color: rgba(255, 255, 255, 0.6);" id="user-role">Loading...</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1 id="page-title">Dashboard</h1>
+            <button class="btn btn-primary" id="new-post-btn" style="display: none;">
+                <i class="ri-add-line"></i> New Post
+            </button>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div id="dashboard-tab" class="tab-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="ri-article-line"></i>
+                    </div>
+                    <div class="stat-number" id="stats-posts">0</div>
+                    <div class="stat-label">Total Posts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="ri-eye-line"></i>
+                    </div>
+                    <div class="stat-number" id="stats-views">0</div>
+                    <div class="stat-label">Total Views</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="ri-chat-3-line"></i>
+                    </div>
+                    <div class="stat-number" id="stats-comments">0</div>
+                    <div class="stat-label">Comments</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="ri-user-line"></i>
+                    </div>
+                    <div class="stat-number" id="stats-users">0</div>
+                    <div class="stat-label">Users</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Recent Posts</h2>
+                    <a href="#" class="btn btn-outline" data-tab="posts">View All</a>
+                </div>
+                <div class="loading" id="recent-posts-loading">
+                    <div class="spinner"></div>
+                </div>
+                <table class="table" id="recent-posts-table" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Status</th>
+                            <th>Views</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-posts-body"></tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Recent Comments</h2>
+                    <a href="#" class="btn btn-outline" data-tab="comments">View All</a>
+                </div>
+                <div class="loading" id="recent-comments-loading">
+                    <div class="spinner"></div>
+                </div>
+                <div id="recent-comments-content" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Posts Management -->
+        <div id="posts-tab" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h2>All Posts</h2>
+                    <button class="btn btn-primary" id="create-post-btn">
+                        <i class="ri-add-line"></i> Create Post
+                    </button>
+                </div>
+                <div class="loading" id="all-posts-loading">
+                    <div class="spinner"></div>
+                </div>
+                <table class="table" id="all-posts-table" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Status</th>
+                            <th>Categories</th>
+                            <th>Views</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="all-posts-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Categories Management -->
+        <div id="categories-tab" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Categories</h2>
+                    <button class="btn btn-primary" id="create-category-btn">
+                        <i class="ri-add-line"></i> Add Category
+                    </button>
+                </div>
+                <div class="loading" id="categories-loading">
+                    <div class="spinner"></div>
+                </div>
+                <table class="table" id="categories-table" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Slug</th>
+                            <th>Posts</th>
+                            <th>Description</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categories-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Comments Management -->
+        <div id="comments-tab" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Comments</h2>
+                </div>
+                <div class="loading" id="comments-loading">
+                    <div class="spinner"></div>
+                </div>
+                <div id="comments-content" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Post Editor Modal -->
+    <div id="post-editor-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Create New Post</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="post-form">
+                <input type="hidden" id="post-id">
+                
+                <div class="form-group">
+                    <label class="form-label" for="post-title">Title</label>
+                    <input type="text" id="post-title" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="post-slug">Slug</label>
+                    <input type="text" id="post-slug" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="post-excerpt">Excerpt</label>
+                    <textarea id="post-excerpt" class="form-input" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="post-content">Content</label>
+                    <div id="editor-container"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="post-categories">Categories</label>
+                    <select id="post-categories" class="form-input" multiple style="height: 120px;"></select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="post-tags">Tags (comma-separated)</label>
+                    <input type="text" id="post-tags" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select id="post-status" class="form-input">
+                        <option value="draft">Draft</option>
+                        <option value="published">Published</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" id="post-featured"> Featured Post
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 30px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Save Post</button>
+                    <button type="button" class="btn btn-outline close-modal" style="flex: 1;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i class="ri-checkbox-circle-line"></i>
+        <span id="toast-message">Notification</span>
+    </div>
+
+    <script src="https://cdn.quilljs.com/1.3.7/quill.js"></script>
+    <script>
+        // Global state
+        let currentUser = null;
+        let categories = [];
+        let quill = null;
+
+        // Initialize Quill editor
+        function initEditor() {
+            quill = new Quill('#editor-container', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'header': 1 }, { 'header': 2 }],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        [{ 'script': 'sub'}, { 'script': 'super' }],
+                        [{ 'indent': '-1'}, { 'indent': '+1' }],
+                        [{ 'direction': 'rtl' }],
+                        [{ 'size': ['small', false, 'large', 'huge'] }],
+                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'font': [] }],
+                        [{ 'align': [] }],
+                        ['clean'],
+                        ['link', 'image', 'video']
+                    ]
+                }
+            });
+        }
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const icon = toast.querySelector('i');
+            
+            toastMessage.textContent = message;
+            toast.className = `toast ${type}`;
+            
+            if (type === 'success') {
+                icon.className = 'ri-checkbox-circle-line';
+            } else if (type === 'error') {
+                icon.className = 'ri-error-warning-line';
+            } else if (type === 'warning') {
+                icon.className = 'ri-alert-line';
+            }
+            
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Load current user
+        async function loadCurrentUser() {
+            try {
+                const response = await fetch('/api/auth/me');
+                if (!response.ok) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                
+                const data = await response.json();
+                currentUser = data.user;
+                
+                // Update UI
+                document.getElementById('user-name').textContent = currentUser.name;
+                document.getElementById('user-role').textContent = currentUser.role;
+                document.getElementById('user-avatar').textContent = currentUser.name.charAt(0).toUpperCase();
+                
+                // Show/hide new post button based on role
+                if (currentUser.role === 'admin' || currentUser.role === 'author') {
+                    document.getElementById('new-post-btn').style.display = 'inline-flex';
+                }
+                
+            } catch (error) {
+                console.error('Error loading user:', error);
+                window.location.href = '/login.html';
+            }
+        }
+
+        // Load dashboard stats
+        async function loadDashboardStats() {
+            try {
+                // Load posts
+                const postsResponse = await fetch('/api/blog/posts?limit=5');
+                const postsData = await postsResponse.json();
+                
+                // Calculate stats
+                const totalPosts = postsData.pagination?.total || 0;
+                const totalViews = postsData.posts.reduce((sum, post) => sum + (post.view_count || 0), 0);
+                
+                // Update stats
+                document.getElementById('stats-posts').textContent = totalPosts;
+                document.getElementById('stats-views').textContent = totalViews.toLocaleString();
+                
+                // Update recent posts table
+                const postsBody = document.getElementById('recent-posts-body');
+                postsBody.innerHTML = postsData.posts.map(post => `
+                    <tr>
+                        <td>${post.title}</td>
+                        <td>
+                            <span class="badge badge-${post.status}">
+                                ${post.status}
+                            </span>
+                        </td>
+                        <td>${post.view_count || 0}</td>
+                        <td>${new Date(post.created_at * 1000).toLocaleDateString()}</td>
+                        <td class="actions">
+                            <button class="action-btn" onclick="editPost('${post.id}')">
+                                <i class="ri-edit-line"></i>
+                            </button>
+                            <button class="action-btn" onclick="deletePost('${post.id}')">
+                                <i class="ri-delete-bin-line"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                document.getElementById('recent-posts-loading').style.display = 'none';
+                document.getElementById('recent-posts-table').style.display = 'table';
+                
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+                showToast('Error loading dashboard', 'error');
+            }
+        }
+
+        // Load categories
+        async function loadCategories() {
+            try {
+                const response = await fetch('/api/blog/categories');
+                const data = await response.json();
+                categories = data;
+                
+                // Update categories select in post editor
+                const categoriesSelect = document.getElementById('post-categories');
+                categoriesSelect.innerHTML = categories.map(cat => 
+                    `<option value="${cat.id}">${cat.name}</option>`
+                ).join('');
+                
+                // Update categories table
+                const categoriesBody = document.getElementById('categories-body');
+                categoriesBody.innerHTML = categories.map(cat => `
+                    <tr>
+                        <td>${cat.name}</td>
+                        <td>${cat.slug}</td>
+                        <td>${cat.post_count || 0}</td>
+                        <td>${cat.description || '-'}</td>
+                        <td class="actions">
+                            <button class="action-btn" onclick="editCategory('${cat.id}')">
+                                <i class="ri-edit-line"></i>
+                            </button>
+                            <button class="action-btn" onclick="deleteCategory('${cat.id}')">
+                                <i class="ri-delete-bin-line"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                document.getElementById('categories-loading').style.display = 'none';
+                document.getElementById('categories-table').style.display = 'table';
+                
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                showToast('Error loading categories', 'error');
+            }
+        }
+
+        // Load all posts
+        async function loadAllPosts() {
+            try {
+                const response = await fetch('/api/blog/posts?limit=50');
+                const data = await response.json();
+                
+                const postsBody = document.getElementById('all-posts-body');
+                postsBody.innerHTML = data.posts.map(post => `
+                    <tr>
+                        <td>${post.title}</td>
+                        <td>${post.author_name}</td>
+                        <td>
+                            <span class="badge badge-${post.status}">
+                                ${post.status}
+                            </span>
+                        </td>
+                        <td>${post.category_names?.join(', ') || '-'}</td>
+                        <td>${post.view_count || 0}</td>
+                        <td>${new Date(post.created_at * 1000).toLocaleDateString()}</td>
+                        <td class="actions">
+                            <a href="/blog/${post.slug}" target="_blank" class="action-btn" title="View">
+                                <i class="ri-external-link-line"></i>
+                            </a>
+                            <button class="action-btn" onclick="editPost('${post.id}')" title="Edit">
+                                <i class="ri-edit-line"></i>
+                            </button>
+                            <button class="action-btn" onclick="deletePost('${post.id}')" title="Delete">
+                                <i class="ri-delete-bin-line"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                document.getElementById('all-posts-loading').style.display = 'none';
+                document.getElementById('all-posts-table').style.display = 'table';
+                
+            } catch (error) {
+                console.error('Error loading posts:', error);
+                showToast('Error loading posts', 'error');
+            }
+        }
+
+        // Create new post
+        async function createPost(postData) {
+            try {
+                const response = await fetch('/api/blog/posts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(postData)
+                });
+                
+                if (response.ok) {
+                    showToast('Post created successfully');
+                    closeModal();
+                    loadAllPosts();
+                    loadDashboardStats();
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to create post');
+                }
+            } catch (error) {
+                console.error('Error creating post:', error);
+                showToast(error.message, 'error');
+            }
+        }
+
+        // Update post
+        async function updatePost(id, postData) {
+            try {
+                const response = await fetch(`/api/blog/posts/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(postData)
+                });
+                
+                if (response.ok) {
+                    showToast('Post updated successfully');
+                    closeModal();
+                    loadAllPosts();
+                    loadDashboardStats();
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to update post');
+                }
+            } catch (error) {
+                console.error('Error updating post:', error);
+                showToast(error.message, 'error');
+            }
+        }
+
+        // Delete post
+        async function deletePost(id) {
+            if (!confirm('Are you sure you want to delete this post?')) return;
+            
+            try {
+                const response = await fetch(`/api/blog/posts/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    showToast('Post deleted successfully');
+                    loadAllPosts();
+                    loadDashboardStats();
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to delete post');
+                }
+            } catch (error) {
+                console.error('Error deleting post:', error);
+                showToast(error.message, 'error');
+            }
+        }
+
+        // Open post editor
+        function openPostEditor(post = null) {
+            const modal = document.getElementById('post-editor-modal');
+            const form = document.getElementById('post-form');
+            const title = document.getElementById('modal-title');
+            
+            if (post) {
+                title.textContent = 'Edit Post';
+                document.getElementById('post-id').value = post.id;
+                document.getElementById('post-title').value = post.title;
+                document.getElementById('post-slug').value = post.slug;
+                document.getElementById('post-excerpt').value = post.excerpt || '';
+                document.getElementById('post-content').value = post.content;
+                document.getElementById('post-tags').value = post.tags?.join(', ') || '';
+                document.getElementById('post-status').value = post.status;
+                document.getElementById('post-featured').checked = post.featured;
+                
+                // Set categories
+                const categoriesSelect = document.getElementById('post-categories');
+                Array.from(categoriesSelect.options).forEach(option => {
+                    option.selected = post.category_ids?.includes(option.value) || false;
+                });
+                
+                if (quill) {
+                    quill.root.innerHTML = post.content;
+                }
+            } else {
+                title.textContent = 'Create New Post';
+                form.reset();
+                if (quill) {
+                    quill.root.innerHTML = '';
+                }
+                document.getElementById('post-id').value = '';
+                document.getElementById('post-slug').value = '';
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('post-editor-modal').style.display = 'none';
+        }
+
+        // Tab switching
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(`${tabId}-tab`).style.display = 'block';
+            
+            // Set active nav item
+            document.querySelector(`.nav-item[data-tab="${tabId}"]`).classList.add('active');
+            
+            // Update page title
+            document.getElementById('page-title').textContent = 
+                tabId.charAt(0).toUpperCase() + tabId.slice(1);
+            
+            // Load tab-specific data
+            switch(tabId) {
+                case 'posts':
+                    loadAllPosts();
+                    break;
+                case 'categories':
+                    loadCategories();
+                    break;
+                case 'dashboard':
+                    loadDashboardStats();
+                    break;
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check authentication
+            await loadCurrentUser();
+            
+            // Initialize editor
+            initEditor();
+            
+            // Load initial data
+            loadDashboardStats();
+            loadCategories();
+            
+            // Event listeners
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchTab(item.dataset.tab);
+                });
+            });
+            
+            document.getElementById('new-post-btn').addEventListener('click', () => {
+                openPostEditor();
+            });
+            
+            document.getElementById('create-post-btn').addEventListener('click', () => {
+                openPostEditor();
+            });
+            
+            document.getElementById('create-category-btn').addEventListener('click', () => {
+                const name = prompt('Enter category name:');
+                if (name) {
+                    createCategory(name);
+                }
+            });
+            
+            document.querySelectorAll('.close-modal').forEach(btn => {
+                btn.addEventListener('click', closeModal);
+            });
+            
+            document.getElementById('post-editor-modal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('post-editor-modal')) {
+                    closeModal();
+                }
+            });
+            
+            // Auto-generate slug from title
+            document.getElementById('post-title').addEventListener('input', function() {
+                if (!document.getElementById('post-id').value) {
+                    const slug = this.value
+                        .toLowerCase()
+                        .replace(/[^\w\s-]/g, '')
+                        .replace(/\s+/g, '-')
+                        .replace(/--+/g, '-')
+                        .trim();
+                    document.getElementById('post-slug').value = slug;
+                }
+            });
+            
+            // Handle form submission
+            document.getElementById('post-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const postId = document.getElementById('post-id').value;
+                const postData = {
+                    title: document.getElementById('post-title').value,
+                    slug: document.getElementById('post-slug').value,
+                    excerpt: document.getElementById('post-excerpt').value,
+                    content: quill.root.innerHTML,
+                    status: document.getElementById('post-status').value,
+                    featured: document.getElementById('post-featured').checked,
+                    category_ids: Array.from(document.getElementById('post-categories').selectedOptions)
+                        .map(option => option.value),
+                    tag_names: document.getElementById('post-tags').value
+                        .split(',')
+                        .map(tag => tag.trim())
+                        .filter(tag => tag)
+                };
+                
+                if (postId) {
+                    await updatePost(postId, postData);
+                } else {
+                    await createPost(postData);
+                }
+            });
+        });
+
+        // Global functions
+        window.editPost = async function(postId) {
+            try {
+                const response = await fetch(`/api/blog/posts/${postId}`);
+                const post = await response.json();
+                openPostEditor(post);
+            } catch (error) {
+                console.error('Error loading post:', error);
+                showToast('Error loading post', 'error');
+            }
+        };
+
+        window.deletePost = deletePost;
+
+        async function createCategory(name) {
+            try {
+                const response = await fetch('/api/blog/categories', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ name })
+                });
+                
+                if (response.ok) {
+                    showToast('Category created successfully');
+                    loadCategories();
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to create category');
+                }
+            } catch (error) {
+                console.error('Error creating category:', error);
+                showToast(error.message, 'error');
+            }
+        }
+
+        window.editCategory = function(categoryId) {
+            const category = categories.find(c => c.id === categoryId);
+            if (!category) return;
+            
+            const newName = prompt('Enter new category name:', category.name);
+            if (newName && newName !== category.name) {
+                // Implement update category endpoint
+                showToast('Update category feature coming soon', 'warning');
+            }
+        };
+
+        window.deleteCategory = async function(categoryId) {
+            if (!confirm('Are you sure you want to delete this category? This will remove it from all posts.')) return;
+            
+            // Implement delete category endpoint
+            showToast('Delete category feature coming soon', 'warning');
+        };
+    </script>
+</body>
+</html>
